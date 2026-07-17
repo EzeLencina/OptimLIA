@@ -12,6 +12,7 @@ import { ResultPanel } from './components/steps/ResultPanel';
 import { generateOutput } from '../domain/services/description.service';
 import { analyzeSeo } from '../domain/services/seo-analysis.service';
 import { analyzeCopywriting } from '../domain/services/copywriting.service';
+import { analyzeImages } from '../domain/services/image-analysis.service';
 
 function showToast(message: string, _type: string = 'info') {
   const container = document.getElementById('toastContainer');
@@ -104,11 +105,13 @@ export default function App() {
       const output = generateOutput(formData, priceCalc.suggestedPrice);
       const seoAnalysis = analyzeSeo(formData, output);
       const copyAnalysis = analyzeCopywriting(formData, output);
+      const imageAnalysis = analyzeImages(formData);
       return (
         <ResultPanel
           output={output}
           seoAnalysis={seoAnalysis}
           copyAnalysis={copyAnalysis}
+          imageAnalysis={imageAnalysis}
           onEdit={() => goToStep(1)}
           onCopy={handleCopy}
           onExportJSON={handleExportJSON}

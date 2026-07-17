@@ -146,6 +146,12 @@ export interface CopywritingAnalysis {
   recommendations: string[];
 }
 
+export interface ImageAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',

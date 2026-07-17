@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import type { GeneratedOutput, SeoAnalysis, CopywritingAnalysis } from '../../../domain/types';
+import type { GeneratedOutput, SeoAnalysis, CopywritingAnalysis, ImageAnalysis } from '../../../domain/types';
 
 interface ResultPanelProps {
   output: GeneratedOutput;
   seoAnalysis: SeoAnalysis | null;
   copyAnalysis: CopywritingAnalysis | null;
+  imageAnalysis: ImageAnalysis | null;
   onEdit: () => void;
   onCopy: (text: string) => void;
   onExportJSON: () => void;
 }
 
-type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'full';
+type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'full';
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'title', label: 'Titulo', icon: 'fa-heading' },
@@ -19,6 +20,7 @@ const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'keywords', label: 'Keywords', icon: 'fa-tags' },
   { id: 'seo', label: 'SEO', icon: 'fa-magnifying-glass-chart' },
   { id: 'copy', label: 'Copywriting', icon: 'fa-pen-fancy' },
+  { id: 'images', label: 'Imagenes', icon: 'fa-images' },
   { id: 'full', label: 'Todo', icon: 'fa-copy' },
 ];
 
@@ -114,7 +116,9 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
   );
 }
 
-export function ResultPanel({ output, seoAnalysis, copyAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
+type AnalysisTabId = 'seo' | 'copy' | 'images';
+
+export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('title');
 
   const tabContent: Record<TabId, { title: string; content: string; isHtml?: boolean }> = {
@@ -124,10 +128,12 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, onEdit, onCopy,
     keywords: { title: 'Palabras Clave', content: output.keywordsText },
     seo: { title: 'Analisis SEO', content: '' },
     copy: { title: 'Analisis de Copywriting', content: '' },
+    images: { title: 'Analisis de Imagenes', content: '' },
     full: { title: 'Publicacion Completa (Todo en uno)', content: output.fullText },
   };
 
   const current = tabContent[activeTab];
+  const isAnalysisTab = (activeTab as AnalysisTabId) in { seo: 1, copy: 1, images: 1 };
 
   const renderAnalysisTab = () => {
     if (activeTab === 'seo') {
@@ -167,10 +173,29 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, onEdit, onCopy,
       );
     }
 
+    if (activeTab === 'images') {
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          {imageAnalysis ? (
+            <AnalysisReport
+              strengths={imageAnalysis.strengths}
+              weaknesses={imageAnalysis.weaknesses}
+              recommendations={imageAnalysis.recommendations}
+              emptyMsg="Completa el checklist de fotos para obtener un analisis visual."
+            />
+          ) : (
+            <div className="seo-empty">
+              <i className="fas fa-spinner fa-spin" />
+              <p>Generando analisis de imagenes...</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return null;
   };
-
-  const isAnalysisTab = activeTab === 'seo' || activeTab === 'copy';
 
   return (
     <div className="step-panel active">
