@@ -201,6 +201,15 @@ export interface ScoreInterpretation {
   confidence: string;
 }
 
+export interface ActionItem {
+  action: string;
+  priority: 'critica' | 'alta' | 'media' | 'baja';
+  time: string;
+  impact: string;
+  difficulty: 'facil' | 'media' | 'dificil';
+  area: string;
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',

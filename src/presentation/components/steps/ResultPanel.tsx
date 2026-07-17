@@ -9,15 +9,19 @@ import type {
   AdsMetrics,
   ScoreBreakdown,
   ScoreInterpretation,
+  ActionItem,
+  PublicationFormData,
 } from '../../../domain/types';
 import { CompetitorInput } from '../common/CompetitorInput';
 import { AdsMetricsInput } from '../common/AdsMetricsInput';
 import { compareWithCompetitors } from '../../../domain/services/comparison.service';
 import { interpretScores } from '../../../domain/services/interpretation.service';
+import { generateActionPlan } from '../../../domain/services/action-plan.service';
 
 interface ResultPanelProps {
   output: GeneratedOutput;
   score: ScoreBreakdown;
+  formData: PublicationFormData;
   seoAnalysis: SeoAnalysis | null;
   copyAnalysis: CopywritingAnalysis | null;
   imageAnalysis: ImageAnalysis | null;
@@ -26,10 +30,11 @@ interface ResultPanelProps {
   onExportJSON: () => void;
 }
 
-type TabId = 'resumen' | 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'full';
+type TabId = 'resumen' | 'acciones' | 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'full';
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'resumen', label: 'Resumen', icon: 'fa-clipboard-list' },
+  { id: 'acciones', label: 'Acciones', icon: 'fa-list-check' },
   { id: 'title', label: 'Titulo', icon: 'fa-heading' },
   { id: 'specs', label: 'Ficha', icon: 'fa-list' },
   { id: 'desc', label: 'Descripcion', icon: 'fa-file-lines' },
@@ -125,6 +130,83 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
           <p>Completa los campos del formulario para obtener un analisis SEO detallado.</p>
         </div>
       )}
+    </div>
+  );
+}
+
+function PriorityBadge({ priority }: { priority: string }) {
+  const colors: Record<string, string> = {
+    critica: '#F23D4F',
+    alta: '#F5A623',
+    media: '#3483FA',
+    baja: '#00A650',
+  };
+  return (
+    <span className="action-badge" style={{ background: colors[priority] || colors.baja }}>
+      {priority}
+    </span>
+  );
+}
+
+function DifficultyBadge({ difficulty }: { difficulty: string }) {
+  const labels: Record<string, string> = { facil: 'Facil', media: 'Media', dificil: 'Dificil' };
+  const icons: Record<string, string> = { facil: 'fa-circle', media: 'fa-circle-half-stroke', dificil: 'fa-circle' };
+  return (
+    <span className={`action-difficulty action-diff-${difficulty}`}>
+      <i className={`fas ${icons[difficulty]}`} /> {labels[difficulty]}
+    </span>
+  );
+}
+
+function ActionPlanReport({ actions }: { actions: ActionItem[] }) {
+  if (actions.length === 0) {
+    return (
+      <div className="seo-empty">
+        <i className="fas fa-check-circle" />
+        <p>No hay acciones pendientes. Tu publicacion esta optimizada.</p>
+      </div>
+    );
+  }
+
+  const totalTime = actions.reduce((acc, a) => {
+    const match = a.time.match(/(\d+)/);
+    return acc + (match ? parseInt(match[1]) : 0);
+  }, 0);
+
+  return (
+    <div className="action-plan">
+      <div className="action-summary-bar">
+        <div className="action-stat">
+          <span className="action-stat-num">{actions.length}</span>
+          <span className="action-stat-label">acciones</span>
+        </div>
+        <div className="action-stat">
+          <span className="action-stat-num">~{totalTime} min</span>
+          <span className="action-stat-label">tiempo total</span>
+        </div>
+        <div className="action-stat">
+          <span className="action-stat-num">{actions.filter((a) => a.priority === 'critica').length}</span>
+          <span className="action-stat-label">criticas</span>
+        </div>
+      </div>
+
+      <div className="action-list">
+        {actions.map((item, i) => (
+          <div key={i} className={`action-card action-${item.priority}`}>
+            <div className="action-card-header">
+              <span className="action-number">{i + 1}</span>
+              <PriorityBadge priority={item.priority} />
+              <span className="action-area">{item.area}</span>
+            </div>
+            <p className="action-text">{item.action}</p>
+            <div className="action-meta">
+              <span className="action-time"><i className="fas fa-clock" /> {item.time}</span>
+              <DifficultyBadge difficulty={item.difficulty} />
+              <span className="action-impact"><i className="fas fa-bolt" /> Impacto {item.impact}</span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -266,9 +348,9 @@ function ComparisonReport({ analysis }: { analysis: ComparisonAnalysis }) {
   );
 }
 
-type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'resumen';
+type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'resumen' | 'acciones';
 
-export function ResultPanel({ output, score, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
+export function ResultPanel({ output, score, formData, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('resumen');
   const [competitors, setCompetitors] = useState<CompetitorData[]>([
     { title: '', description: '' },
@@ -311,6 +393,7 @@ export function ResultPanel({ output, score, seoAnalysis, copyAnalysis, imageAna
 
   const tabContent: Record<TabId, { title: string; content: string; isHtml?: boolean }> = {
     resumen: { title: 'Resumen de la Publicacion', content: '' },
+    acciones: { title: 'Plan de Acciones', content: '' },
     title: { title: 'Titulo Optimizado', content: output.title },
     specs: { title: 'Ficha Tecnica Completa', content: output.specsText },
     desc: { title: 'Descripcion Optimizada', content: output.descriptionHtml, isHtml: true },
@@ -337,6 +420,25 @@ export function ResultPanel({ output, score, seoAnalysis, copyAnalysis, imageAna
             <div className="seo-empty">
               <i className="fas fa-spinner fa-spin" />
               <p>Generando interpretacion...</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (activeTab === 'acciones') {
+      const actions = (seoAnalysis && copyAnalysis && imageAnalysis)
+        ? generateActionPlan(score, formData, seoAnalysis, copyAnalysis, imageAnalysis)
+        : null;
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          {actions ? (
+            <ActionPlanReport actions={actions} />
+          ) : (
+            <div className="seo-empty">
+              <i className="fas fa-spinner fa-spin" />
+              <p>Generando plan de acciones...</p>
             </div>
           )}
         </div>
