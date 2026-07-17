@@ -54,11 +54,11 @@ function hasBoldText(html: string): boolean {
 
 function analyzeClarity(text: string): { ok: boolean; msg: string } {
   const avgLen = avgSentenceLength(text);
-  if (text.length === 0) return { ok: false, msg: 'La descripcion esta vacia' };
-  if (avgLen > 30) return { ok: false, msg: `Oraciones demasiado largas (promedio ${Math.round(avgLen)} palabras). Divide en frases mas cortas` };
-  if (avgLen > 20) return { ok: true, msg: `Longitud de oraciones aceptable (promedio ${Math.round(avgLen)} palabras)` };
-  if (avgLen > 0) return { ok: true, msg: `Oraciones claras y directas (promedio ${Math.round(avgLen)} palabras)` };
-  return { ok: false, msg: 'No se detectaron oraciones en la descripcion' };
+  if (text.length === 0) return { ok: false, msg: 'La descripcion esta vacia. Escribe algo que conecte con el comprador.' };
+  if (avgLen > 30) return { ok: false, msg: `Oraciones demasiado largas (promedio ${Math.round(avgLen)} palabras). Divide en frases cortas para que se lean del telefono y convenzan rapido.` };
+  if (avgLen > 20) return { ok: true, msg: `Longitud de oraciones aceptable (promedio ${Math.round(avgLen)} palabras). Se lee comodo.` };
+  if (avgLen > 0) return { ok: true, msg: `Oraciones claras y directas (promedio ${Math.round(avgLen)} palabras). Ideal para retener la atencion.` };
+  return { ok: false, msg: 'No se detectaron oraciones en la descripcion.' };
 }
 
 function analyzeScannability(html: string, text: string): { ok: boolean; msg: string } {
@@ -69,41 +69,41 @@ function analyzeScannability(html: string, text: string): { ok: boolean; msg: st
     /<br/.test(html),
   ].filter(Boolean).length;
 
-  if (features >= 3) return { ok: true, msg: 'Excelente escaneabilidad: negritas, listas y saltos de linea' };
-  if (features === 2) return { ok: true, msg: 'Buena escaneabilidad con algunos elementos visuales' };
-  if (features === 1) return { ok: false, msg: 'Escaneabilidad basica. Agrega negritas, listas o saltos de linea' };
-  return { ok: false, msg: 'Texto sin formato. Es dificil de escanear rapidamente' };
+  if (features >= 3) return { ok: true, msg: 'Excelente escaneabilidad: negritas, listas y saltos de linea. El comprador encuentra lo clave al instante.' };
+  if (features === 2) return { ok: true, msg: 'Buena escaneabilidad con varios elementos visuales que ayudan a leer rapido.' };
+  if (features === 1) return { ok: false, msg: 'Escaneabilidad basica. Agrega negritas en titulos y separa en listas o saltos de linea.' };
+  return { ok: false, msg: 'Texto sin formato. Es dificil de escanear y el comprador se va. Da aire con negritas y listas.' };
 }
 
 function analyzeBenefits(formData: PublicationFormData): { ok: boolean; msg: string } {
   const features = formData.description.features.filter((f) => f.name.trim() || f.benefit.trim());
-  if (features.length === 0) return { ok: false, msg: 'No se destacaron beneficios del producto' };
-  if (features.length >= 3) return { ok: true, msg: `${features.length} beneficios destacados. Comunica valor concreto al comprador` };
-  return { ok: true, msg: `${features.length} beneficio(s) destacado(s). Agrega mas para reforzar el valor` };
+  if (features.length === 0) return { ok: false, msg: 'No destacaste beneficios del producto. El comprador no sabe por que comprarlo.' };
+  if (features.length >= 3) return { ok: true, msg: `${features.length} beneficios destacados. Comunicas valor concreto y diferencias tu oferta.` };
+  return { ok: true, msg: `${features.length} beneficio(s) destacado(s). Agrega mas para reforzar el valor y la decision de compra.` };
 }
 
 function analyzeFeatures(html: string, formData: PublicationFormData): { ok: boolean; msg: string } {
   const hasSpecsSection = html.toLowerCase().includes('ficha tecnica') || html.toLowerCase().includes('caracteristicas');
   const hasFeaturesInDesc = formData.description.features.some((f) => f.name.trim());
 
-  if (hasSpecsSection && hasFeaturesInDesc) return { ok: true, msg: 'Caracteristicas presentes en ficha tecnica y en descripcion' };
-  if (hasSpecsSection) return { ok: true, msg: 'Caracteristicas en la ficha tecnica. Considera incluirlas tambien en la descripcion' };
-  if (hasFeaturesInDesc) return { ok: true, msg: 'Caracteristicas en la descripcion. La ficha tecnica complementa la info' };
-  return { ok: false, msg: 'No se detectan caracteristicas ni ficha tecnica' };
+  if (hasSpecsSection && hasFeaturesInDesc) return { ok: true, msg: 'Caracteristicas presentes en ficha tecnica y en descripcion. Informacion coherente y completa.' };
+  if (hasSpecsSection) return { ok: true, msg: 'Caracteristicas en la ficha tecnica. Considera repetirlas en la descripcion para reforzar el beneficio.' };
+  if (hasFeaturesInDesc) return { ok: true, msg: 'Caracteristicas en la descripcion. La ficha tecnica complementa y ayuda al filtrado.' };
+  return { ok: false, msg: 'No se detectan caracteristicas ni ficha tecnica. Sin ellas, el comprador no tiene argumentos para comprar.' };
 }
 
 function analyzeCTA(text: string): { ok: boolean; msg: string } {
   const found = countMatches(text, CTA_KEYWORDS);
-  if (found.length >= 2) return { ok: true, msg: `CTA efectivos detectados: "${found.slice(0, 3).join('", "')}"` };
-  if (found.length === 1) return { ok: true, msg: `CTA presente: "${found[0]}". Agrega uno o dos mas para reforzar la urgencia` };
-  return { ok: false, msg: 'Sin llamadas a la accion (CTA). Agrega frases que inviten a comprar' };
+  if (found.length >= 2) return { ok: true, msg: `Llamadas a la accion efectivas: "${found.slice(0, 3).join('", "')}". Empujan al cierre.` };
+  if (found.length === 1) return { ok: true, msg: `CTA presente: "${found[0]}". Agrega uno o dos mas para reforzar la urgencia de compra.` };
+  return { ok: false, msg: 'Sin llamadas a la accion (CTA). Cierra con frases que inviten a comprar ya, como "Agregalo al carrito".' };
 }
 
 function analyzeTrust(text: string): { ok: boolean; msg: string } {
   const found = countMatches(text, TRUST_KEYWORDS);
-  if (found.length >= 3) return { ok: true, msg: `Elementos de confianza: "${found.slice(0, 3).join('", "')}"` };
-  if (found.length >= 1) return { ok: true, msg: `Algunos elementos de confianza: "${found.join('", "')}". Agrega garantia o envio` };
-  return { ok: false, msg: 'Sin elementos de confianza. Incluye garantia, envio o MercadoPago' };
+  if (found.length >= 3) return { ok: true, msg: `Buenos elementos de confianza: "${found.slice(0, 3).join('", "')}". Reducen el miedo a comprar.` };
+  if (found.length >= 1) return { ok: true, msg: `Algunos elementos de confianza: "${found.join('", "')}". Suma garantia y envio para reforzarlos.` };
+  return { ok: false, msg: 'Sin elementos de confianza. Incluye garantia, tipo de envio y MercadoPago para que el comprador se sienta seguro.' };
 }
 
 function analyzeObjections(text: string, formData: PublicationFormData): { ok: boolean; msg: string } {
@@ -111,9 +111,9 @@ function analyzeObjections(text: string, formData: PublicationFormData): { ok: b
   const hasFaqs = formData.description.faqs.some((f) => f.question.trim() || f.answer.trim());
   const total = found.length + (hasFaqs ? 2 : 0);
 
-  if (total >= 3) return { ok: true, msg: 'Buen manejo de objeciones con FAQ y respuestas preventivas' };
-  if (total >= 1) return { ok: true, msg: 'Algunas objeciones abordadas. Agrega mas FAQs para cubrir dudas comunes' };
-  return { ok: false, msg: 'Sin manejo de objeciones. Agrega una seccion de preguntas frecuentes' };
+  if (total >= 3) return { ok: true, msg: 'Buen manejo de objeciones con FAQ y respuestas preventivas. Anticipas las dudas y vendes mas.' };
+  if (total >= 1) return { ok: true, msg: 'Algunas objeciones abordadas. Agrega mas FAQs para cubrir las dudas que frenan la compra.' };
+  return { ok: false, msg: 'Sin manejo de objeciones. Agrega una seccion de preguntas frecuentes para quitar miedos y devoluciones.' };
 }
 
 function analyzeSeoInDesc(text: string, formData: PublicationFormData): { ok: boolean; msg: string } {
@@ -128,10 +128,10 @@ function analyzeSeoInDesc(text: string, formData: PublicationFormData): { ok: bo
   const found = keywords.filter((kw) => lower.includes(kw.toLowerCase()));
   const missing = keywords.filter((kw) => !lower.includes(kw.toLowerCase()));
 
-  if (missing.length === 0 && keywords.length > 0) return { ok: true, msg: `Todas las keywords (${keywords.length}) presentes en la descripcion` };
-  if (found.length > 0) return { ok: true, msg: `${found.length}/${keywords.length} keywords en la descripcion. Faltan: "${missing.join('", "')}"` };
-  if (keywords.length > 0) return { ok: false, msg: `Ninguna keyword aparece en la descripcion. Keywords definidas: "${keywords.join('", "')}"` };
-  return { ok: false, msg: 'Sin keywords definidas en el paso de SEO' };
+  if (missing.length === 0 && keywords.length > 0) return { ok: true, msg: `Todas las keywords (${keywords.length}) estan en la descripcion. Refuerzas el posicionamiento.` };
+  if (found.length > 0) return { ok: true, msg: `${found.length}/${keywords.length} keywords en la descripcion. Faltan: "${missing.join('", "')}".` };
+  if (keywords.length > 0) return { ok: false, msg: `Ninguna keyword aparece en la descripcion. Definiste: "${keywords.join('", "')}". Distribuyelas en el texto.` };
+  return { ok: false, msg: 'Sin keywords definidas en el paso de SEO. Definelas para que la descripcion posicione.' };
 }
 
 export function analyzeCopywriting(
@@ -178,27 +178,27 @@ export function analyzeCopywriting(
   else weaknesses.push(seoInDesc.msg);
 
   if (descText.length < 100) {
-    recommendations.push('Agrega mas contenido a la descripcion (minimo 200 caracteres para ML)');
+    recommendations.push('Agrega mas contenido a la descripcion (minimo 200 caracteres para ML). Mas info = mas confianza y ventas.');
   }
 
   if (!cta.ok) {
-    recommendations.push('Agrega un CTA al final: "Agregalo al carrito ahora" o "Envio gratis a todo el pais"');
+    recommendations.push('Cierra con un CTA claro: "Agregalo al carrito ahora" o "Envio gratis a todo el pais".');
   }
 
   if (!trust.ok) {
-    recommendations.push('Incluye garantia, tipo de envio y MercadoPago para generar confianza');
+    recommendations.push('Incluye garantia, tipo de envio y MercadoPago para generar confianza y bajar la objecion de precio.');
   }
 
   if (!formData.description.faqs.some((f) => f.question.trim())) {
-    recommendations.push('Agrega 2-3 preguntas frecuentes para responder dudas y mejorar SEO');
+    recommendations.push('Agrega 2 o 3 preguntas frecuentes para responder dudas, reducir devoluciones y mejorar el SEO interno.');
   }
 
   if (!hasBoldText(descHtml)) {
-    recommendations.push('Usa negritas en los titulos de cada seccion para mejorar la lectura');
+    recommendations.push('Usa negritas en los titulos de cada seccion para que el comprador capte lo importante al vuelo.');
   }
 
   if (descText.length >= 200 && strengths.length >= 4) {
-    recommendations.push('Tu descripcion tiene buena estructura. Revisa el score para ver si falta algo');
+    recommendations.push('Tu descripcion tiene buena estructura. Revisa el score para ver si falta pulir algo.');
   }
 
   return { strengths, weaknesses, recommendations };

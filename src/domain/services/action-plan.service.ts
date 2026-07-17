@@ -28,7 +28,7 @@ function fromTitle(score: number, data: PublicationFormData): ActionItem[] {
 
   if (!product.name.trim()) {
     actions.push({
-      action: 'Completar el nombre del producto en el campo "Nombre". Ejemplo: "Auriculares Bluetooth Inalambricos"',
+      action: 'Completa el nombre del producto en el campo "Nombre". Ejemplo: "Auriculares Bluetooth Inalambricos". Sin esto, nadie te encuentra.',
       priority: 'critica',
       time: '1 min',
       impact: 'critica',
@@ -39,7 +39,7 @@ function fromTitle(score: number, data: PublicationFormData): ActionItem[] {
 
   if (!product.brand.trim()) {
     actions.push({
-      action: 'Agregar la marca del producto. La marca es un filtro de busqueda principal en MercadoLibre',
+      action: 'Agrega la marca del producto. Es el filtro de busqueda mas usado en MercadoLibre y suma confianza.',
       priority: 'critica',
       time: '1 min',
       impact: 'critica',
@@ -50,7 +50,7 @@ function fromTitle(score: number, data: PublicationFormData): ActionItem[] {
 
   if (!product.category.trim()) {
     actions.push({
-      action: 'Seleccionar la categoria del producto. Sin categoria, la publicacion no aparece en busquedas filtradas',
+      action: 'Selecciona la categoria del producto. Sin categoria correcta, la publicacion no aparece en las busquedas filtradas.',
       priority: 'critica',
       time: '1 min',
       impact: 'alta',
@@ -61,7 +61,7 @@ function fromTitle(score: number, data: PublicationFormData): ActionItem[] {
 
   if (score < 50 && product.name.trim() && product.brand.trim()) {
     actions.push({
-      action: 'Agregar modelo, atributo o uso al titulo para completar los 60 caracteres disponibles',
+      action: 'Agrega modelo, atributo o uso al titulo para completar los 60 caracteres y captar mas busquedas.',
       priority: 'alta',
       time: '2 min',
       impact: 'alta',
@@ -86,7 +86,7 @@ function fromSpecs(score: number, data: PublicationFormData): ActionItem[] {
 
   if (missing.length >= 3) {
     actions.push({
-      action: `Completar ficha tecnica: faltan ${missing.join(', ')}. Estos campos mejoran el filtrado en busquedas`,
+      action: `Completa la ficha tecnica: faltan ${missing.join(', ')}. Estos campos mejoran el filtrado y la confianza en busquedas.`,
       priority: 'alta',
       time: '5 min',
       impact: 'alta',
@@ -95,7 +95,7 @@ function fromSpecs(score: number, data: PublicationFormData): ActionItem[] {
     });
   } else if (missing.length > 0 && score < 80) {
     actions.push({
-      action: `Agregar campos faltantes en ficha tecnica: ${missing.join(', ')}`,
+      action: `Agrega los campos faltantes en la ficha tecnica: ${missing.join(', ')} para un perfil mas completo.`,
       priority: 'media',
       time: '3 min',
       impact: 'media',
@@ -113,7 +113,7 @@ function fromPhotos(score: number, data: PublicationFormData): ActionItem[] {
 
   if (checked === 0) {
     actions.push({
-      action: 'Subir minimo 6 fotos: principal con fondo blanco, uso real, detalle, contenido de caja, 2 angulos e infografia',
+      action: 'Sube minimo 6 fotos: principal con fondo blanco, uso real, detalle, contenido de caja, 2 angulos e infografia. Es lo que mas convierte.',
       priority: 'critica',
       time: '30 min',
       impact: 'critica',
@@ -122,7 +122,7 @@ function fromPhotos(score: number, data: PublicationFormData): ActionItem[] {
     });
   } else if (checked < 6) {
     actions.push({
-      action: `Agregar ${6 - checked} fotos mas. ML premia publicaciones con 6+ fotos. Incluir: lifestyle, infografia de medidas y escala`,
+      action: `Agrega ${6 - checked} fotos mas. ML premia publicaciones con 6+ fotos. Incluye: lifestyle, infografia de medidas y escala.`,
       priority: 'alta',
       time: '20 min',
       impact: 'alta',
@@ -133,9 +133,9 @@ function fromPhotos(score: number, data: PublicationFormData): ActionItem[] {
     const unchecked = data.photos.filter((p) => !p.checked);
     if (unchecked.length > 0) {
       actions.push({
-        action: `Completar las ${unchecked.length} fotos pendientes del checklist para maximo puntaje visual`,
+        action: `Completa las ${unchecked.length} fotos pendientes del checklist para lograr la cobertura visual maxima.`,
         priority: 'media',
-      time: '15 min',
+        time: '15 min',
         impact: 'media',
         difficulty: 'media',
         area: 'Imagenes',
@@ -146,7 +146,7 @@ function fromPhotos(score: number, data: PublicationFormData): ActionItem[] {
   const mainPhoto = data.photos.find((p) => p.id === 1);
   if (mainPhoto && !mainPhoto.checked) {
     actions.push({
-      action: 'Configurar foto principal con fondo blanco puro. Es lo primero que ve el comprador',
+      action: 'Configura la foto principal con fondo blanco puro. Es lo primero que ve el comprador y define el click.',
       priority: 'critica',
       time: '10 min',
       impact: 'critica',
@@ -164,7 +164,7 @@ function fromDescription(score: number, data: PublicationFormData): ActionItem[]
 
   if (!description.intro.trim()) {
     actions.push({
-      action: 'Escribir una introduccion de 2-3 lineas que explique que es el producto y para quien va dirigido',
+      action: 'Escribe una introduccion de 2 o 3 lineas que explique que es el producto y para quien va dirigido. Engancha desde el inicio.',
       priority: 'critica',
       time: '5 min',
       impact: 'alta',
@@ -176,7 +176,7 @@ function fromDescription(score: number, data: PublicationFormData): ActionItem[]
   const filledFeatures = description.features.filter((f) => f.name.trim() && f.benefit.trim());
   if (filledFeatures.length === 0) {
     actions.push({
-      action: 'Agregar minimo 3 beneficios con nombre + beneficio. Ejemplo: "Bateria larga" + "Dura 8 horas sin cargar"',
+      action: 'Agrega minimo 3 beneficios con nombre + beneficio. Ejemplo: "Bateria larga" + "Dura 8 horas sin cargar". Venden por ti.',
       priority: 'alta',
       time: '5 min',
       impact: 'alta',
@@ -185,7 +185,7 @@ function fromDescription(score: number, data: PublicationFormData): ActionItem[]
     });
   } else if (filledFeatures.length < 3) {
     actions.push({
-      action: `Agregar ${3 - filledFeatures.length} beneficios mas. Los 3 minimos cubren las dudas mas comunes del comprador`,
+      action: `Agrega ${3 - filledFeatures.length} beneficios mas. Los 3 minimos cubren las dudas mas comunes del comprador.`,
       priority: 'media',
       time: '3 min',
       impact: 'media',
@@ -197,7 +197,7 @@ function fromDescription(score: number, data: PublicationFormData): ActionItem[]
   const filledFaqs = description.faqs.filter((f) => f.question.trim() && f.answer.trim());
   if (filledFaqs.length === 0) {
     actions.push({
-      action: 'Crear 2-3 preguntas frecuentes. Reducen devoluciones y mejoran SEO interno',
+      action: 'Crea 2 o 3 preguntas frecuentes. Reducen devoluciones y mejoran el SEO interno de la publicacion.',
       priority: 'alta',
       time: '5 min',
       impact: 'media',
@@ -215,7 +215,7 @@ function fromSeo(score: number, data: PublicationFormData): ActionItem[] {
 
   if (!keywords.primary.trim()) {
     actions.push({
-      action: 'Definir la keyword principal. Es la palabra mas importante por la que los compradores buscan tu producto',
+      action: 'Define la keyword principal. Es la palabra mas importante por la que los compradores buscan tu producto.',
       priority: 'critica',
       time: '2 min',
       impact: 'critica',
@@ -230,7 +230,7 @@ function fromSeo(score: number, data: PublicationFormData): ActionItem[] {
 
   if (secondaryCount === 0) {
     actions.push({
-      action: 'Agregar 2-3 keywords secundarias. Amplian el alcance en busquedas relacionadas',
+      action: 'Agrega 2 o 3 keywords secundarias. Amplian el alcance en busquedas relacionadas con tu producto.',
       priority: 'alta',
       time: '3 min',
       impact: 'alta',
@@ -239,7 +239,7 @@ function fromSeo(score: number, data: PublicationFormData): ActionItem[] {
     });
   } else if (secondaryCount < 3) {
     actions.push({
-      action: `Agregar ${3 - secondaryCount} keyword secundaria mas para cubrir mas busquedas`,
+      action: `Agrega ${3 - secondaryCount} keyword secundaria mas para cubrir mas busquedas y competir mejor.`,
       priority: 'media',
       time: '2 min',
       impact: 'media',
@@ -251,7 +251,7 @@ function fromSeo(score: number, data: PublicationFormData): ActionItem[] {
   const longtailCount = [keywords.longtail1, keywords.longtail2].filter((k) => k.trim()).length;
   if (longtailCount === 0) {
     actions.push({
-      action: 'Agregar keywords long-tail (frases largas). Capturan busquedas especificas con menor competencia',
+      action: 'Agrega keywords long-tail (frases largas). Capturan busquedas especificas con menos competencia y mas intencion de compra.',
       priority: 'media',
       time: '3 min',
       impact: 'media',
@@ -269,7 +269,7 @@ function fromCopywriting(copy: CopywritingAnalysis): ActionItem[] {
   const hasCta = copy.strengths.some((s) => s.toLowerCase().includes('cta'));
   if (!hasCta && copy.weaknesses.some((w) => w.toLowerCase().includes('cta'))) {
     actions.push({
-      action: 'Agregar un CTA al final de la descripcion: "Agregalo al carrito" o "Envio gratis a todo el pais"',
+      action: 'Cierra la descripcion con un CTA claro: "Agregalo al carrito" o "Envio gratis a todo el pais". Empuja la decision.',
       priority: 'media',
       time: '1 min',
       impact: 'media',
@@ -281,7 +281,7 @@ function fromCopywriting(copy: CopywritingAnalysis): ActionItem[] {
   const hasTrust = copy.strengths.some((s) => s.toLowerCase().includes('confianza'));
   if (!hasTrust && copy.weaknesses.some((w) => w.toLowerCase().includes('confianza'))) {
     actions.push({
-      action: 'Incluir garantia, tipo de envio y MercadoPago en la descripcion para generar confianza',
+      action: 'Incluye garantia, tipo de envio y MercadoPago en la descripcion para generar confianza y quitar el miedo a comprar.',
       priority: 'alta',
       time: '3 min',
       impact: 'alta',
@@ -299,7 +299,7 @@ function fromImages(images: ImageAnalysis): ActionItem[] {
   const hasLifestyle = images.weaknesses.some((w) => w.toLowerCase().includes('estilo de vida'));
   if (hasLifestyle) {
     actions.push({
-      action: 'Agregar foto lifestyle que muestre el producto en contexto de uso real. Conecta emocionalmente',
+      action: 'Agrega una foto lifestyle que muestre el producto en contexto de uso real. Conecta emocionalmente y dispara la compra.',
       priority: 'media',
       time: '10 min',
       impact: 'media',
@@ -311,7 +311,7 @@ function fromImages(images: ImageAnalysis): ActionItem[] {
   const hasInfographic = images.weaknesses.some((w) => w.toLowerCase().includes('infografia'));
   if (hasInfographic) {
     actions.push({
-      action: 'Crear infografia con medidas o especificaciones visuales. Reduce devoluciones por expectativa',
+      action: 'Crea una infografia con medidas o especificaciones visuales. Reduce devoluciones por expectativa de tamano.',
       priority: 'media',
       time: '15 min',
       impact: 'media',

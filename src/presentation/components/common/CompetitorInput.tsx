@@ -16,7 +16,7 @@ export function CompetitorInput({ competitors, onUpdate, onCompare }: Competitor
     <div className="competitor-input">
       <div className="competitor-header">
         <h4><i className="fas fa-users" /> Competidores</h4>
-        <p>Pega el titulo y descripcion de hasta 3 competidores de MercadoLibre</p>
+        <p>Pega el titulo y la descripcion de hasta 3 competidores de MercadoLibre para ver en que los superas.</p>
       </div>
 
       <div className="competitor-list">

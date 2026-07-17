@@ -13,7 +13,7 @@ export function DescriptionStep({ description, onUpdate, onNext, onPrev }: Descr
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-file-lines" /> Descripcion Optimizada</h2>
-        <p>Genera una descripcion profesional con todas las secciones que MercadoLibre premia.</p>
+        <p>Arma una descripcion profesional con las secciones que MercadoLibre premia y que convencen al comprador de comprar ya.</p>
       </div>
 
       <div className="form-grid">

@@ -13,7 +13,7 @@ export function SeoStep({ keywords, keywordAnalysis, onUpdate, onGenerate, onPre
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-magnifying-glass-chart" /> SEO y Palabras Clave</h2>
-        <p>Optimiza tu publicacion con las palabras clave correctas para aparecer primero en busquedas.</p>
+        <p>Elige las palabras clave correctas para que tu publicacion aparezca donde el comprador realmente busca.</p>
       </div>
 
       <div className="form-grid">

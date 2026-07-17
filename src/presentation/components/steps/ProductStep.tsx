@@ -17,7 +17,7 @@ export function ProductStep({ product, onUpdate, onNext }: ProductStepProps) {
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-box" /> Datos del Producto</h2>
-        <p>Ingresa la informacion basica de tu producto para generar una publicacion optimizada.</p>
+        <p>Completa la informacion basica de tu producto. Con esto armamos un titulo que te encuentran en MercadoLibre.</p>
       </div>
 
       <div className="form-grid">

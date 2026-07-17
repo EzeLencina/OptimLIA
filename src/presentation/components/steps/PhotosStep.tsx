@@ -29,7 +29,7 @@ export function PhotosStep({
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-camera" /> Fotos y Video</h2>
-        <p>Las fotos son decisivas para la venta. Marca cada tipo de foto que ya tienes preparada.</p>
+        <p>Las fotos deciden la venta. Marca cada tipo que ya tengas listo para armar una publicacion que convierte.</p>
       </div>
 
       <div className="photo-checklist">

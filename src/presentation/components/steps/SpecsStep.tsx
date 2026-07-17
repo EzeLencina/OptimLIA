@@ -31,7 +31,7 @@ export function SpecsStep({
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-list-check" /> Ficha Tecnica</h2>
-        <p>Completa todas las especificaciones tecnicas. Un 100% de campos completos mejora tu posicion en busqueda.</p>
+        <p>Completa todas las especificaciones. Cuantos mas campos llenes, mejor filtras y rankeas en las busquedas de MercadoLibre.</p>
       </div>
 
       <div className="specs-completeness">

@@ -47,7 +47,7 @@ export function AdsMetricsInput({ metrics, onUpdate }: AdsMetricsInputProps) {
     <div className="ads-input">
       <div className="ads-header">
         <h4><i className="fas fa-chart-line" /> Metricas de Mercado Ads</h4>
-        <p>Ingresá las metricas de tu campana para obtener un diagnostico</p>
+        <p>Ingresa las metricas de tu campana para recibir un diagnostico que mejore tu rentabilidad.</p>
       </div>
 
       <div className="ads-grid">

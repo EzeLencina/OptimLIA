@@ -127,7 +127,7 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
       {analysis.strengths.length === 0 && analysis.weaknesses.length === 0 && (
         <div className="seo-empty">
           <i className="fas fa-info-circle" />
-          <p>Completa los campos del formulario para obtener un analisis SEO detallado.</p>
+          <p>Completa los campos del formulario para obtener un analisis SEO detallado que mejore tu posicionamiento.</p>
         </div>
       )}
     </div>
@@ -161,10 +161,10 @@ function DifficultyBadge({ difficulty }: { difficulty: string }) {
 function ActionPlanReport({ actions }: { actions: ActionItem[] }) {
   if (actions.length === 0) {
     return (
-      <div className="seo-empty">
-        <i className="fas fa-check-circle" />
-        <p>No hay acciones pendientes. Tu publicacion esta optimizada.</p>
-      </div>
+        <div className="seo-empty">
+          <i className="fas fa-check-circle" />
+          <p>No hay acciones pendientes. Tu publicacion esta lista para vender al maximo.</p>
+        </div>
     );
   }
 
@@ -292,10 +292,10 @@ function ComparisonReport({ analysis }: { analysis: ComparisonAnalysis }) {
 
   if (!hasData) {
     return (
-      <div className="seo-empty">
-        <i className="fas fa-info-circle" />
-        <p>No hay datos suficientes para la comparacion.</p>
-      </div>
+        <div className="seo-empty">
+          <i className="fas fa-info-circle" />
+          <p>No hay datos suficientes para comparar. Pega al menos un competidor para ver tu ventaja.</p>
+        </div>
     );
   }
 
@@ -538,7 +538,7 @@ export function ResultPanel({ output, score, formData, seoAnalysis, copyAnalysis
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-check-circle" /> Publicacion Generada</h2>
-        <p>Tu publicacion optimizada esta lista. Copia y pega directamente en MercadoLibre.</p>
+        <p>Tu publicacion optimizada esta lista. Copiala y pegala directamente en MercadoLibre para empezar a vender.</p>
       </div>
 
       <div className="output-tabs">

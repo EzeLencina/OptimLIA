@@ -28,55 +28,55 @@ function countWithDescription(photos: PhotoItem[]): number {
 }
 
 function analyzeQuantity(checked: number): { ok: boolean; msg: string } {
-  if (checked === 0) return { ok: false, msg: 'No hay fotos marcadas. ML permite hasta 10 fotos' };
-  if (checked <= 3) return { ok: false, msg: `Solo ${checked}/${TOTAL_PHOTOS} fotos. Las publicaciones con 6+ fotos venden mas` };
-  if (checked <= 5) return { ok: true, msg: `${checked}/${TOTAL_PHOTOS} fotos. Buen inicio, ideal llegar a 8+` };
-  if (checked <= 8) return { ok: true, msg: `${checked}/${TOTAL_PHOTOS} fotos. Excelente cobertura visual` };
-  return { ok: true, msg: `${checked}/${TOTAL_PHOTOS} fotos. Cobertura maxima, ideal para conversion` };
+  if (checked === 0) return { ok: false, msg: 'No hay fotos marcadas. MercadoLibre permite hasta 10 y las publicaciones con 6+ fotos venden significativamente mas.' };
+  if (checked <= 3) return { ok: false, msg: `Solo ${checked}/${TOTAL_PHOTOS} fotos. Las publicaciones con 6 o mas fotos generan mas confianza y conversion.` };
+  if (checked <= 5) return { ok: true, msg: `${checked}/${TOTAL_PHOTOS} fotos. Buen inicio, pero apunta a 8+ para maximizar la venta.` };
+  if (checked <= 8) return { ok: true, msg: `${checked}/${TOTAL_PHOTOS} fotos. Excelente cobertura visual que reduce dudas del comprador.` };
+  return { ok: true, msg: `${checked}/${TOTAL_PHOTOS} fotos. Cobertura maxima. Tienes el escenario ideal para convertir visitas en ventas.` };
 }
 
 function analyzeMainPhoto(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const main = getPhotoStatus(photos, 1);
-  if (!main) return { ok: false, msg: 'Foto principal no configurada' };
-  if (main.checked) return { ok: true, msg: 'Foto principal con fondo blanco configurada' };
-  return { ok: false, msg: 'Foto principal (fondo blanco) sin marcar. Es la mas importante' };
+  if (!main) return { ok: false, msg: 'Foto principal no configurada.' };
+  if (main.checked) return { ok: true, msg: 'Foto principal con fondo blanco configurada. Es la carta de presentacion que decide el click.' };
+  return { ok: false, msg: 'Foto principal (fondo blanco) sin marcar. Es la mas importante: sin ella baja el CTR y las ventas.' };
 }
 
 function analyzeBackground(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const main = getPhotoStatus(photos, 1);
-  if (!main?.checked) return { ok: false, msg: 'Sin foto de fondo blanco. ML requiere fondo blanco para la principal' };
+  if (!main?.checked) return { ok: false, msg: 'Sin foto de fondo blanco. MercadoLibre prioriza y requiere fondo blanco para la principal.' };
   if (main.description.toLowerCase().includes('fondo blanco') || main.description.toLowerCase().includes('blanco')) {
-    return { ok: true, msg: 'Fondo blanco especificado en la foto principal' };
+    return { ok: true, msg: 'Fondo blanco especificado en la foto principal. Cumple el estandar y destaca el producto.' };
   }
-  return { ok: true, msg: 'Foto principal marcada. Verifica que el fondo sea blanco puro' };
+  return { ok: true, msg: 'Foto principal marcada. Verifica que el fondo sea blanco puro para no perder visibilidad en busquedas.' };
 }
 
 function analyzeLifestyle(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const photo = getPhotoStatus(photos, 10);
-  if (!photo) return { ok: false, msg: 'Foto de estilo de vida no configurada' };
-  if (photo.checked) return { ok: true, msg: 'Foto de estilo de vida presente. Conecta emocionalmente con el comprador' };
-  return { ok: false, msg: 'Foto de estilo de vida sin marcar. Ayuda a generar deseo' };
+  if (!photo) return { ok: false, msg: 'Foto de estilo de vida no configurada.' };
+  if (photo.checked) return { ok: true, msg: 'Foto de estilo de vida presente. Conecta emocionalmente y dispara el deseo de compra.' };
+  return { ok: false, msg: 'Foto de estilo de vida sin marcar. Ayuda a generar deseo y a imaginar el producto en su vida.' };
 }
 
 function analyzeInfographic(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const photo = getPhotoStatus(photos, 9);
-  if (!photo) return { ok: false, msg: 'Infografia de medidas no configurada' };
-  if (photo.checked) return { ok: true, msg: 'Infografia de medidas presente. Reduce objeciones de tamano' };
-  return { ok: false, msg: 'Infografia sin marcar. Las medidas visuales reducen devoluciones' };
+  if (!photo) return { ok: false, msg: 'Infografia de medidas no configurada.' };
+  if (photo.checked) return { ok: true, msg: 'Infografia de medidas presente. Reduce objeciones de tamano y baja las devoluciones.' };
+  return { ok: false, msg: 'Infografia sin marcar. Las medidas visuales aclaran expectativas y reducen devoluciones.' };
 }
 
 function analyzeDetail(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const photo = getPhotoStatus(photos, 3);
-  if (!photo) return { ok: false, msg: 'Foto de detalle no configurada' };
-  if (photo.checked) return { ok: true, msg: 'Foto de detalle anti-objecion presente. Muestra calidad del producto' };
-  return { ok: false, msg: 'Foto de detalle sin marcar. Un close-up de material genera confianza' };
+  if (!photo) return { ok: false, msg: 'Foto de detalle no configurada.' };
+  if (photo.checked) return { ok: true, msg: 'Foto de detalle anti-objecion presente. Muestra la calidad y justifica el precio.' };
+  return { ok: false, msg: 'Foto de detalle sin marcar. Un close-up del material genera confianza y apoya la decision de compra.' };
 }
 
 function analyzeBoxContents(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const photo = getPhotoStatus(photos, 4);
-  if (!photo) return { ok: false, msg: 'Foto de contenido de caja no configurada' };
-  if (photo.checked) return { ok: true, msg: 'Foto de contenido de caja presente. El comprador sabe que recibe' };
-  return { ok: false, msg: 'Foto de contenido sin marcar. Reduce sorpresas y devoluciones' };
+  if (!photo) return { ok: false, msg: 'Foto de contenido de caja no configurada.' };
+  if (photo.checked) return { ok: true, msg: 'Foto de contenido de caja presente. El comprador sabe exactamente que recibe.' };
+  return { ok: false, msg: 'Foto de contenido sin marcar. Mostrarlo reduce sorpresas y devoluciones por expectation mismatch.' };
 }
 
 function analyzeAngles(photos: PhotoItem[]): { ok: boolean; msg: string } {
@@ -84,32 +84,32 @@ function analyzeAngles(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const a2 = getPhotoStatus(photos, 6);
   const checked = [a1, a2].filter((p) => p?.checked).length;
 
-  if (checked === 2) return { ok: true, msg: '2 angulos alternativos presentes. Vision completa del producto' };
-  if (checked === 1) return { ok: true, msg: '1 angulo alternativo. Agrega otro para completar la vision' };
-  return { ok: false, msg: 'Sin angulos alternativos. El comprador solo ve una perspectiva' };
+  if (checked === 2) return { ok: true, msg: '2 angulos alternativos presentes. Das una vision completa que quita dudas.' };
+  if (checked === 1) return { ok: true, msg: '1 angulo alternativo. Agrega otro para completar la vision del producto.' };
+  return { ok: false, msg: 'Sin angulos alternativos. El comprador solo ve una perspectiva y duda al comprar.' };
 }
 
 function analyzeDescriptions(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const withDesc = countWithDescription(photos);
   const checked = countChecked(photos);
-  if (checked === 0) return { ok: false, msg: 'Sin fotos para evaluar descripciones' };
-  if (withDesc === checked) return { ok: true, msg: `Todas las ${checked} fotos tienen descripcion. Buena practica` };
-  if (withDesc >= checked / 2) return { ok: true, msg: `${withDesc}/${checked} fotos con descripcion. Mejora las que faltan` };
-  return { ok: false, msg: `Solo ${withDesc}/${checked} fotos con descripcion. Agrega contexto a cada imagen` };
+  if (checked === 0) return { ok: false, msg: 'Sin fotos para evaluar descripciones.' };
+  if (withDesc === checked) return { ok: true, msg: `Todas las ${checked} fotos tienen descripcion. Buena practica que suma contexto y SEO.` };
+  if (withDesc >= checked / 2) return { ok: true, msg: `${withDesc}/${checked} fotos con descripcion. Mejora las que faltan para reforzar el mensaje.` };
+  return { ok: false, msg: `Solo ${withDesc}/${checked} fotos con descripcion. Agrega contexto a cada imagen para vender mejor.` };
 }
 
 function analyzeUsagePhoto(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const photo = getPhotoStatus(photos, 2);
-  if (!photo) return { ok: false, msg: 'Foto de uso real no configurada' };
-  if (photo.checked) return { ok: true, msg: 'Foto de uso real presente. Muestra el producto en contexto' };
-  return { ok: false, msg: 'Foto de uso real sin marcar. Ayuda al comprador a visualizar el producto' };
+  if (!photo) return { ok: false, msg: 'Foto de uso real no configurada.' };
+  if (photo.checked) return { ok: true, msg: 'Foto de uso real presente. Muestra el producto en contexto y facilita la visualizacion.' };
+  return { ok: false, msg: 'Foto de uso real sin marcar. Ayuda al comprador a imaginarse usandolo y decide mas rapido.' };
 }
 
 function analyzeScalePhoto(photos: PhotoItem[]): { ok: boolean; msg: string } {
   const photo = getPhotoStatus(photos, 7);
-  if (!photo) return { ok: false, msg: 'Foto de escala no configurada' };
-  if (photo.checked) return { ok: true, msg: 'Foto de escala presente. El comprador dimensiona el tamano real' };
-  return { ok: false, msg: 'Foto de escala sin marcar. Reduce sorpresas por tamano' };
+  if (!photo) return { ok: false, msg: 'Foto de escala no configurada.' };
+  if (photo.checked) return { ok: true, msg: 'Foto de escala presente. El comprador dimensiona el tamano real y duda menos.' };
+  return { ok: false, msg: 'Foto de escala sin marcar. Reduce sorpresas por tamano y reclamos post-venta.' };
 }
 
 export function analyzeImages(formData: PublicationFormData): ImageAnalysis {
@@ -165,15 +165,15 @@ export function analyzeImages(formData: PublicationFormData): ImageAnalysis {
   else weaknesses.push(descriptions.msg);
 
   if (checked < 6) {
-    recommendations.push('ML recomienda minimo 6 fotos. Agrega angulos alternativos y detalles');
+    recommendations.push('MercadoLibre recomienda minimo 6 fotos. Agrega angulos alternativos y detalles para subir la conversion.');
   }
 
   if (!isCriticalPhotoChecked(photos, 9)) {
-    recommendations.push('Agrega una infografia con medidas. Reduce devoluciones por expectativa de tamano');
+    recommendations.push('Agrega una infografia con medidas. Reduce devoluciones por expectativa de tamano y aclara la compra.');
   }
 
   if (!isCriticalPhotoChecked(photos, 10)) {
-    recommendations.push('Una foto lifestyle genera conexion emocional y mejora la tasa de conversion');
+    recommendations.push('Una foto lifestyle genera conexion emocional y mejora la tasa de conversion.');
   }
 
   const uncheckedCritical = CRITICAL_PHOTOS.filter((id) => !isCriticalPhotoChecked(photos, id));
@@ -182,11 +182,11 @@ export function analyzeImages(formData: PublicationFormData): ImageAnalysis {
       const item = PHOTO_CHECKLIST.find((p) => p.id === id);
       return item?.title || `Foto #${id}`;
     });
-    recommendations.push(`Fotos criticas pendientes: ${labels.join(', ')}`);
+    recommendations.push(`Fotos criticas pendientes: ${labels.join(', ')}. Son clave para cerrar la venta.`);
   }
 
   if (checked >= 8 && strengths.length >= 6) {
-    recommendations.push('Excelente cobertura visual. Verifica calidad de resolucion (minimo 1200x1200px)');
+    recommendations.push('Excelente cobertura visual. Verifica resolucion minima de 1200x1200px para que se vea nitida en movil.');
   }
 
   return { strengths, weaknesses, recommendations };

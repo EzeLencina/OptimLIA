@@ -116,7 +116,7 @@ export function compareWithCompetitors(
     return {
       strengths: [],
       weaknesses: [],
-      missing: ['No se ingresaron competidores para comparar'],
+      missing: ['No ingresaste competidores para comparar. Pega al menos uno para ver como te diferencias.'],
       excess: [],
       different_keywords: [],
       different_benefits: [],
@@ -141,13 +141,13 @@ export function compareWithCompetitors(
   if (onlyInCompetitors.length > 0) {
     const top = onlyInCompetitors.slice(0, 10);
     different_keywords.push(...top);
-    weaknesses.push(`Keywords en competidores pero no en tu publicacion: "${top.slice(0, 5).join('", "')}"`);
+    weaknesses.push(`Tus competidores usan estas keywords y tu no: "${top.slice(0, 5).join('", "')}". Sumalas para no perder esas busquedas.`);
   }
 
   if (onlyInMine.length > 0) {
     const top = onlyInMine.slice(0, 10);
     different_keywords.push(...top);
-    strengths.push(`Keywords unicas en tu publicacion: "${top.slice(0, 5).join('", "')}"`);
+    strengths.push(`Keywords unicas en tu publicacion: "${top.slice(0, 5).join('", "')}". Te diferencian y captan nichos propios.`);
   }
 
   const myFeatures = extractFeatures(output.descriptionHtml);
@@ -163,7 +163,7 @@ export function compareWithCompetitors(
   if (missingFeatures.length > 0) {
     const unique = [...new Set(missingFeatures)].slice(0, 5);
     different_benefits.push(...unique);
-    missing.push(`Beneficios/caracteristicas en competidores: "${unique.map((f) => f.substring(0, 60)).join('", "')}"`);
+    missing.push(`Beneficios/caracteristicas que si tienen tus competidores: "${unique.map((f) => f.substring(0, 60)).join('", "')}". Considera sumarlos.`);
   }
 
   const myAttributes = extractAttributes(output.fullText);
@@ -178,7 +178,7 @@ export function compareWithCompetitors(
   if (missingAttrs.length > 0) {
     const unique = [...new Set(missingAttrs)].slice(0, 5);
     missing_attributes.push(...unique);
-    missing.push(`Atributos presentes en competidores: "${unique.join('", "')}"`);
+    missing.push(`Atributos que muestran tus competidores y tu no: "${unique.join('", "')}". Agregalos para equiparar la ficha.`);
   }
 
   if (myFeatures.length > 0 && compFeatures.length > 0) {
@@ -192,7 +192,7 @@ export function compareWithCompetitors(
   }
 
   if (myFeatures.length > compFeatures.length / validCompetitors.length) {
-    strengths.push(`Tu publicacion tiene ${myFeatures.length} beneficios destacades, mas que el promedio de competidores`);
+    strengths.push(`Tu publicacion tiene ${myFeatures.length} beneficios destacados, mas que el promedio de competidores`);
   }
 
   if (output.descriptionHtml.includes('<strong>') || output.descriptionHtml.includes('<b>')) {

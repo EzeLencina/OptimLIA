@@ -16,7 +16,7 @@ export function PricingStep({ pricing, priceCalc, onUpdate, onNext, onPrev }: Pr
     <div className="step-panel active">
       <div className="panel-header">
         <h2><i className="fas fa-tags" /> Condiciones de Venta</h2>
-        <p>Configura precio, envio y tipo de publicacion para maximizar ventas.</p>
+        <p>Define precio, envio y tipo de publicacion para ganar margen y vender mas sin regalar rentabilidad.</p>
       </div>
 
       <div className="form-grid">
