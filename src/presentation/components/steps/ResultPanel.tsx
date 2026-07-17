@@ -6,8 +6,10 @@ import type {
   ImageAnalysis,
   ComparisonAnalysis,
   CompetitorData,
+  AdsMetrics,
 } from '../../../domain/types';
 import { CompetitorInput } from '../common/CompetitorInput';
+import { AdsMetricsInput } from '../common/AdsMetricsInput';
 import { compareWithCompetitors } from '../../../domain/services/comparison.service';
 
 interface ResultPanelProps {
@@ -20,7 +22,7 @@ interface ResultPanelProps {
   onExportJSON: () => void;
 }
 
-type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'full';
+type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'full';
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'title', label: 'Titulo', icon: 'fa-heading' },
@@ -31,6 +33,7 @@ const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'copy', label: 'Copywriting', icon: 'fa-pen-fancy' },
   { id: 'images', label: 'Imagenes', icon: 'fa-images' },
   { id: 'compare', label: 'Comparar', icon: 'fa-scale-balanced' },
+  { id: 'ads', label: 'Ads', icon: 'fa-chart-line' },
   { id: 'full', label: 'Todo', icon: 'fa-copy' },
 ];
 
@@ -183,7 +186,7 @@ function ComparisonReport({ analysis }: { analysis: ComparisonAnalysis }) {
   );
 }
 
-type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare';
+type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare' | 'ads';
 
 export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('title');
@@ -193,6 +196,15 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
     { title: '', description: '' },
   ]);
   const [comparisonResult, setComparisonResult] = useState<ComparisonAnalysis | null>(null);
+  const [adsMetrics, setAdsMetrics] = useState<AdsMetrics>({
+    impressions: '',
+    clicks: '',
+    sales: '',
+    ctr: '',
+    roas: '',
+    acos: '',
+    conversion: '',
+  });
 
   const handleUpdateCompetitor = (index: number, data: CompetitorData) => {
     setCompetitors((prev) => {
@@ -208,6 +220,10 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
     setComparisonResult(result);
   };
 
+  const handleUpdateAds = (field: keyof AdsMetrics, value: string) => {
+    setAdsMetrics((prev) => ({ ...prev, [field]: value }));
+  };
+
   const tabContent: Record<TabId, { title: string; content: string; isHtml?: boolean }> = {
     title: { title: 'Titulo Optimizado', content: output.title },
     specs: { title: 'Ficha Tecnica Completa', content: output.specsText },
@@ -217,6 +233,7 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
     copy: { title: 'Analisis de Copywriting', content: '' },
     images: { title: 'Analisis de Imagenes', content: '' },
     compare: { title: 'Comparacion con Competidores', content: '' },
+    ads: { title: 'Analisis de Mercado Ads', content: '' },
     full: { title: 'Publicacion Completa (Todo en uno)', content: output.fullText },
   };
 
@@ -297,6 +314,15 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
               <ComparisonReport analysis={comparisonResult} />
             </div>
           )}
+        </div>
+      );
+    }
+
+    if (activeTab === 'ads') {
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          <AdsMetricsInput metrics={adsMetrics} onUpdate={handleUpdateAds} />
         </div>
       );
     }

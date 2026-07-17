@@ -167,6 +167,23 @@ export interface ComparisonAnalysis {
   missing_attributes: string[];
 }
 
+export interface AdsMetrics {
+  impressions: string;
+  clicks: string;
+  sales: string;
+  ctr: string;
+  roas: string;
+  acos: string;
+  conversion: string;
+}
+
+export interface AdsAnalysisItem {
+  problem: string;
+  impact: string;
+  priority: 'alta' | 'media' | 'baja';
+  action: string;
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',
