@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import type { GeneratedOutput, SeoAnalysis, CopywritingAnalysis, ImageAnalysis } from '../../../domain/types';
+import type {
+  GeneratedOutput,
+  SeoAnalysis,
+  CopywritingAnalysis,
+  ImageAnalysis,
+  ComparisonAnalysis,
+  CompetitorData,
+} from '../../../domain/types';
+import { CompetitorInput } from '../common/CompetitorInput';
+import { compareWithCompetitors } from '../../../domain/services/comparison.service';
 
 interface ResultPanelProps {
   output: GeneratedOutput;
@@ -11,7 +20,7 @@ interface ResultPanelProps {
   onExportJSON: () => void;
 }
 
-type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'full';
+type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'full';
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'title', label: 'Titulo', icon: 'fa-heading' },
@@ -21,6 +30,7 @@ const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'seo', label: 'SEO', icon: 'fa-magnifying-glass-chart' },
   { id: 'copy', label: 'Copywriting', icon: 'fa-pen-fancy' },
   { id: 'images', label: 'Imagenes', icon: 'fa-images' },
+  { id: 'compare', label: 'Comparar', icon: 'fa-scale-balanced' },
   { id: 'full', label: 'Todo', icon: 'fa-copy' },
 ];
 
@@ -62,7 +72,6 @@ function AnalysisReport({ strengths, weaknesses, recommendations, emptyMsg }: {
       </div>
     );
   }
-
   return (
     <div className="seo-report">
       <ReportSection title="Fortalezas" icon="fa-check-circle" colorClass="seo-strengths" items={strengths} />
@@ -77,7 +86,6 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
     <div className="seo-report">
       <ReportSection title="Fortalezas" icon="fa-check-circle" colorClass="seo-strengths" items={analysis.strengths} />
       <ReportSection title="Debilidades" icon="fa-triangle-exclamation" colorClass="seo-weaknesses" items={analysis.weaknesses} />
-
       {analysis.missing_keywords.length > 0 && (
         <div className="seo-section">
           <h4 className="seo-section-title seo-missing">
@@ -90,7 +98,6 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
           </div>
         </div>
       )}
-
       {analysis.repeated_words.length > 0 && (
         <div className="seo-section">
           <h4 className="seo-section-title seo-repeated">
@@ -103,9 +110,7 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
           </div>
         </div>
       )}
-
       <ReportSection title="Recomendaciones" icon="fa-lightbulb" colorClass="seo-recommendations" items={analysis.recommendations} />
-
       {analysis.strengths.length === 0 && analysis.weaknesses.length === 0 && (
         <div className="seo-empty">
           <i className="fas fa-info-circle" />
@@ -116,10 +121,92 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
   );
 }
 
-type AnalysisTabId = 'seo' | 'copy' | 'images';
+function ComparisonReport({ analysis }: { analysis: ComparisonAnalysis }) {
+  const hasData = analysis.strengths.length > 0 || analysis.weaknesses.length > 0 ||
+    analysis.missing.length > 0 || analysis.excess.length > 0;
+
+  if (!hasData) {
+    return (
+      <div className="seo-empty">
+        <i className="fas fa-info-circle" />
+        <p>No hay datos suficientes para la comparacion.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="seo-report">
+      <ReportSection title="Fortalezas vs Competidores" icon="fa-check-circle" colorClass="seo-strengths" items={analysis.strengths} />
+      <ReportSection title="Debilidades vs Competidores" icon="fa-triangle-exclamation" colorClass="seo-weaknesses" items={analysis.weaknesses} />
+      <ReportSection title="Que Falta" icon="fa-ban" colorClass="seo-missing" items={analysis.missing} />
+      <ReportSection title="Que Sobra" icon="fa-trash-can" colorClass="seo-repeated" items={analysis.excess} />
+
+      {analysis.different_keywords.length > 0 && (
+        <div className="seo-section">
+          <h4 className="seo-section-title seo-missing">
+            <i className="fas fa-tags" /> Keywords Diferentes
+          </h4>
+          <div className="seo-tag-list">
+            {analysis.different_keywords.map((k, i) => (
+              <span key={i} className="seo-tag seo-tag-missing">{k}</span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {analysis.different_benefits.length > 0 && (
+        <div className="seo-section">
+          <h4 className="seo-section-title seo-weaknesses">
+            <i className="fas fa-star" /> Beneficios Diferentes
+          </h4>
+          <ul>
+            {analysis.different_benefits.map((b, i) => (
+              <li key={i} className="seo-item seo-warn">{b}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {analysis.missing_attributes.length > 0 && (
+        <div className="seo-section">
+          <h4 className="seo-section-title seo-missing">
+            <i className="fas fa-list-check" /> Atributos Faltantes
+          </h4>
+          <div className="seo-tag-list">
+            {analysis.missing_attributes.map((a, i) => (
+              <span key={i} className="seo-tag seo-tag-repeated">{a}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare';
 
 export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('title');
+  const [competitors, setCompetitors] = useState<CompetitorData[]>([
+    { title: '', description: '' },
+    { title: '', description: '' },
+    { title: '', description: '' },
+  ]);
+  const [comparisonResult, setComparisonResult] = useState<ComparisonAnalysis | null>(null);
+
+  const handleUpdateCompetitor = (index: number, data: CompetitorData) => {
+    setCompetitors((prev) => {
+      const next = [...prev];
+      next[index] = data;
+      return next;
+    });
+    setComparisonResult(null);
+  };
+
+  const handleCompare = () => {
+    const result = compareWithCompetitors(output, competitors);
+    setComparisonResult(result);
+  };
 
   const tabContent: Record<TabId, { title: string; content: string; isHtml?: boolean }> = {
     title: { title: 'Titulo Optimizado', content: output.title },
@@ -129,11 +216,12 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
     seo: { title: 'Analisis SEO', content: '' },
     copy: { title: 'Analisis de Copywriting', content: '' },
     images: { title: 'Analisis de Imagenes', content: '' },
+    compare: { title: 'Comparacion con Competidores', content: '' },
     full: { title: 'Publicacion Completa (Todo en uno)', content: output.fullText },
   };
 
   const current = tabContent[activeTab];
-  const isAnalysisTab = (activeTab as AnalysisTabId) in { seo: 1, copy: 1, images: 1 };
+  const isAnalysisTab = (activeTab as AnalysisTabId) in { seo: 1, copy: 1, images: 1, compare: 1 };
 
   const renderAnalysisTab = () => {
     if (activeTab === 'seo') {
@@ -188,6 +276,25 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
             <div className="seo-empty">
               <i className="fas fa-spinner fa-spin" />
               <p>Generando analisis de imagenes...</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (activeTab === 'compare') {
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          <CompetitorInput
+            competitors={competitors}
+            onUpdate={handleUpdateCompetitor}
+            onCompare={handleCompare}
+          />
+          {comparisonResult && (
+            <div className="comparison-result">
+              <hr className="separator" />
+              <ComparisonReport analysis={comparisonResult} />
             </div>
           )}
         </div>

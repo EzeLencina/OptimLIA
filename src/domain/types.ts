@@ -152,6 +152,21 @@ export interface ImageAnalysis {
   recommendations: string[];
 }
 
+export interface CompetitorData {
+  title: string;
+  description: string;
+}
+
+export interface ComparisonAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  missing: string[];
+  excess: string[];
+  different_keywords: string[];
+  different_benefits: string[];
+  missing_attributes: string[];
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',

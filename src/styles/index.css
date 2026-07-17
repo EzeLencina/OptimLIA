@@ -1176,6 +1176,106 @@ textarea {
     font-size: 14px;
 }
 
+/* COMPETITOR INPUT */
+.competitor-input {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.competitor-header h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.competitor-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.competitor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.competitor-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.competitor-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-primary);
+    transition: var(--transition);
+}
+
+.competitor-toggle:hover {
+    background: var(--border);
+}
+
+.competitor-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--ml-blue);
+    color: var(--text-white);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.competitor-label {
+    flex: 1;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.competitor-toggle .fa-chevron-up,
+.competitor-toggle .fa-chevron-down {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.competitor-fields {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.competitor-btn {
+    align-self: flex-start;
+}
+
+.comparison-result {
+    margin-top: 16px;
+}
+
+.separator {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+}
+
 /* RESPONSIVE */
 @media (max-width: 900px) {
     .sidebar {
