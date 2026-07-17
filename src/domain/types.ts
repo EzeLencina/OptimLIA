@@ -184,6 +184,23 @@ export interface AdsAnalysisItem {
   action: string;
 }
 
+export interface ScoreCategory {
+  name: string;
+  score: number;
+  max: number;
+  weight: string;
+  explanation: string;
+}
+
+export interface ScoreInterpretation {
+  summary: string;
+  categories: ScoreCategory[];
+  strengths: string[];
+  problems: string[];
+  priority_actions: string[];
+  confidence: string;
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',

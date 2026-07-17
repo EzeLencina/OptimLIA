@@ -109,6 +109,7 @@ export default function App() {
       return (
         <ResultPanel
           output={output}
+          score={score}
           seoAnalysis={seoAnalysis}
           copyAnalysis={copyAnalysis}
           imageAnalysis={imageAnalysis}

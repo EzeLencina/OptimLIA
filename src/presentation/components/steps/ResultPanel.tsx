@@ -7,13 +7,17 @@ import type {
   ComparisonAnalysis,
   CompetitorData,
   AdsMetrics,
+  ScoreBreakdown,
+  ScoreInterpretation,
 } from '../../../domain/types';
 import { CompetitorInput } from '../common/CompetitorInput';
 import { AdsMetricsInput } from '../common/AdsMetricsInput';
 import { compareWithCompetitors } from '../../../domain/services/comparison.service';
+import { interpretScores } from '../../../domain/services/interpretation.service';
 
 interface ResultPanelProps {
   output: GeneratedOutput;
+  score: ScoreBreakdown;
   seoAnalysis: SeoAnalysis | null;
   copyAnalysis: CopywritingAnalysis | null;
   imageAnalysis: ImageAnalysis | null;
@@ -22,9 +26,10 @@ interface ResultPanelProps {
   onExportJSON: () => void;
 }
 
-type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'full';
+type TabId = 'resumen' | 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'full';
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
+  { id: 'resumen', label: 'Resumen', icon: 'fa-clipboard-list' },
   { id: 'title', label: 'Titulo', icon: 'fa-heading' },
   { id: 'specs', label: 'Ficha', icon: 'fa-list' },
   { id: 'desc', label: 'Descripcion', icon: 'fa-file-lines' },
@@ -124,6 +129,81 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
   );
 }
 
+function InterpretationReport({ interpretation }: { interpretation: ScoreInterpretation }) {
+  return (
+    <div className="interpretation-report">
+      <div className="interp-summary">
+        <p>{interpretation.summary}</p>
+      </div>
+
+      <div className="interp-categories">
+        <h4><i className="fas fa-chart-bar" /> Desglose por Categoria</h4>
+        <div className="interp-cat-list">
+          {interpretation.categories.map((cat, i) => (
+            <div key={i} className="interp-cat">
+              <div className="interp-cat-header">
+                <span className="interp-cat-name">{cat.name}</span>
+                <span className="interp-cat-score">
+                  <strong>{cat.score}</strong>/{cat.max}
+                  <span className="interp-cat-weight">({cat.weight})</span>
+                </span>
+              </div>
+              <div className="interp-cat-bar">
+                <div
+                  className="interp-cat-fill"
+                  style={{
+                    width: `${cat.score}%`,
+                    background: cat.score >= 80 ? '#00A650' : cat.score >= 50 ? '#3483FA' : cat.score >= 30 ? '#F5A623' : '#F23D4F',
+                  }}
+                />
+              </div>
+              <p className="interp-cat-explanation">{cat.explanation}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {interpretation.strengths.length > 0 && (
+        <div className="interp-section">
+          <h4><i className="fas fa-check-circle interp-green" /> Puntos Fuertes</h4>
+          <ul>
+            {interpretation.strengths.map((s, i) => (
+              <li key={i} className="interp-item interp-ok">{s}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {interpretation.problems.length > 0 && (
+        <div className="interp-section">
+          <h4><i className="fas fa-triangle-exclamation interp-red" /> Problemas</h4>
+          <ul>
+            {interpretation.problems.map((p, i) => (
+              <li key={i} className="interp-item interp-warn">{p}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {interpretation.priority_actions.length > 0 && (
+        <div className="interp-section">
+          <h4><i className="fas fa-bolt interp-orange" /> Acciones Prioritarias</h4>
+          <ul>
+            {interpretation.priority_actions.map((a, i) => (
+              <li key={i} className="interp-item interp-action">{a}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="interp-confidence">
+        <i className="fas fa-shield-halved" />
+        <span><strong>Nivel de confianza:</strong> {interpretation.confidence}</span>
+      </div>
+    </div>
+  );
+}
+
 function ComparisonReport({ analysis }: { analysis: ComparisonAnalysis }) {
   const hasData = analysis.strengths.length > 0 || analysis.weaknesses.length > 0 ||
     analysis.missing.length > 0 || analysis.excess.length > 0;
@@ -186,10 +266,10 @@ function ComparisonReport({ analysis }: { analysis: ComparisonAnalysis }) {
   );
 }
 
-type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare' | 'ads';
+type AnalysisTabId = 'seo' | 'copy' | 'images' | 'compare' | 'ads' | 'resumen';
 
-export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('title');
+export function ResultPanel({ output, score, seoAnalysis, copyAnalysis, imageAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
+  const [activeTab, setActiveTab] = useState<TabId>('resumen');
   const [competitors, setCompetitors] = useState<CompetitorData[]>([
     { title: '', description: '' },
     { title: '', description: '' },
@@ -205,6 +285,11 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
     acos: '',
     conversion: '',
   });
+
+  const interpretation: ScoreInterpretation | null =
+    seoAnalysis && copyAnalysis && imageAnalysis
+      ? interpretScores(score, seoAnalysis, copyAnalysis, imageAnalysis)
+      : null;
 
   const handleUpdateCompetitor = (index: number, data: CompetitorData) => {
     setCompetitors((prev) => {
@@ -225,6 +310,7 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
   };
 
   const tabContent: Record<TabId, { title: string; content: string; isHtml?: boolean }> = {
+    resumen: { title: 'Resumen de la Publicacion', content: '' },
     title: { title: 'Titulo Optimizado', content: output.title },
     specs: { title: 'Ficha Tecnica Completa', content: output.specsText },
     desc: { title: 'Descripcion Optimizada', content: output.descriptionHtml, isHtml: true },
@@ -241,6 +327,22 @@ export function ResultPanel({ output, seoAnalysis, copyAnalysis, imageAnalysis, 
   const isAnalysisTab = (activeTab as AnalysisTabId) in { seo: 1, copy: 1, images: 1, compare: 1 };
 
   const renderAnalysisTab = () => {
+    if (activeTab === 'resumen') {
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          {interpretation ? (
+            <InterpretationReport interpretation={interpretation} />
+          ) : (
+            <div className="seo-empty">
+              <i className="fas fa-spinner fa-spin" />
+              <p>Generando interpretacion...</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     if (activeTab === 'seo') {
       return (
         <div className="output-box">
