@@ -132,6 +132,14 @@ export interface GeneratedOutput {
   fullText: string;
 }
 
+export interface SeoAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  missing_keywords: string[];
+  repeated_words: string[];
+  recommendations: string[];
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',
