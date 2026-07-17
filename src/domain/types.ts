@@ -140,6 +140,12 @@ export interface SeoAnalysis {
   recommendations: string[];
 }
 
+export interface CopywritingAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}
+
 export const INITIAL_PRODUCT: ProductData = {
   name: '',
   brand: '',

@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import type { GeneratedOutput, SeoAnalysis } from '../../../domain/types';
+import type { GeneratedOutput, SeoAnalysis, CopywritingAnalysis } from '../../../domain/types';
 
 interface ResultPanelProps {
   output: GeneratedOutput;
   seoAnalysis: SeoAnalysis | null;
+  copyAnalysis: CopywritingAnalysis | null;
   onEdit: () => void;
   onCopy: (text: string) => void;
   onExportJSON: () => void;
 }
 
-type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'full';
+type TabId = 'title' | 'specs' | 'desc' | 'keywords' | 'seo' | 'copy' | 'full';
 
 const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'title', label: 'Titulo', icon: 'fa-heading' },
@@ -17,37 +18,63 @@ const TABS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'desc', label: 'Descripcion', icon: 'fa-file-lines' },
   { id: 'keywords', label: 'Keywords', icon: 'fa-tags' },
   { id: 'seo', label: 'SEO', icon: 'fa-magnifying-glass-chart' },
+  { id: 'copy', label: 'Copywriting', icon: 'fa-pen-fancy' },
   { id: 'full', label: 'Todo', icon: 'fa-copy' },
 ];
+
+function ReportSection({ title, icon, colorClass, items }: {
+  title: string;
+  icon: string;
+  colorClass: string;
+  items: string[];
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div className="seo-section">
+      <h4 className={`seo-section-title ${colorClass}`}>
+        <i className={`fas ${icon}`} /> {title}
+      </h4>
+      <ul>
+        {items.map((s, i) => (
+          <li key={i} className={`seo-item ${
+            colorClass === 'seo-strengths' ? 'seo-ok' :
+            colorClass === 'seo-weaknesses' ? 'seo-warn' : 'seo-rec'
+          }`}>{s}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function AnalysisReport({ strengths, weaknesses, recommendations, emptyMsg }: {
+  strengths: string[];
+  weaknesses: string[];
+  recommendations: string[];
+  emptyMsg: string;
+}) {
+  if (strengths.length === 0 && weaknesses.length === 0) {
+    return (
+      <div className="seo-empty">
+        <i className="fas fa-info-circle" />
+        <p>{emptyMsg}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="seo-report">
+      <ReportSection title="Fortalezas" icon="fa-check-circle" colorClass="seo-strengths" items={strengths} />
+      <ReportSection title="Debilidades" icon="fa-triangle-exclamation" colorClass="seo-weaknesses" items={weaknesses} />
+      <ReportSection title="Recomendaciones" icon="fa-lightbulb" colorClass="seo-recommendations" items={recommendations} />
+    </div>
+  );
+}
 
 function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
   return (
     <div className="seo-report">
-      {analysis.strengths.length > 0 && (
-        <div className="seo-section">
-          <h4 className="seo-section-title seo-strengths">
-            <i className="fas fa-check-circle" /> Fortalezas
-          </h4>
-          <ul>
-            {analysis.strengths.map((s, i) => (
-              <li key={i} className="seo-item seo-ok">{s}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {analysis.weaknesses.length > 0 && (
-        <div className="seo-section">
-          <h4 className="seo-section-title seo-weaknesses">
-            <i className="fas fa-triangle-exclamation" /> Debilidades
-          </h4>
-          <ul>
-            {analysis.weaknesses.map((w, i) => (
-              <li key={i} className="seo-item seo-warn">{w}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <ReportSection title="Fortalezas" icon="fa-check-circle" colorClass="seo-strengths" items={analysis.strengths} />
+      <ReportSection title="Debilidades" icon="fa-triangle-exclamation" colorClass="seo-weaknesses" items={analysis.weaknesses} />
 
       {analysis.missing_keywords.length > 0 && (
         <div className="seo-section">
@@ -75,18 +102,7 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
         </div>
       )}
 
-      {analysis.recommendations.length > 0 && (
-        <div className="seo-section">
-          <h4 className="seo-section-title seo-recommendations">
-            <i className="fas fa-lightbulb" /> Recomendaciones
-          </h4>
-          <ul>
-            {analysis.recommendations.map((r, i) => (
-              <li key={i} className="seo-item seo-rec">{r}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <ReportSection title="Recomendaciones" icon="fa-lightbulb" colorClass="seo-recommendations" items={analysis.recommendations} />
 
       {analysis.strengths.length === 0 && analysis.weaknesses.length === 0 && (
         <div className="seo-empty">
@@ -98,7 +114,7 @@ function SeoReport({ analysis }: { analysis: SeoAnalysis }) {
   );
 }
 
-export function ResultPanel({ output, seoAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
+export function ResultPanel({ output, seoAnalysis, copyAnalysis, onEdit, onCopy, onExportJSON }: ResultPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('title');
 
   const tabContent: Record<TabId, { title: string; content: string; isHtml?: boolean }> = {
@@ -107,10 +123,54 @@ export function ResultPanel({ output, seoAnalysis, onEdit, onCopy, onExportJSON 
     desc: { title: 'Descripcion Optimizada', content: output.descriptionHtml, isHtml: true },
     keywords: { title: 'Palabras Clave', content: output.keywordsText },
     seo: { title: 'Analisis SEO', content: '' },
+    copy: { title: 'Analisis de Copywriting', content: '' },
     full: { title: 'Publicacion Completa (Todo en uno)', content: output.fullText },
   };
 
   const current = tabContent[activeTab];
+
+  const renderAnalysisTab = () => {
+    if (activeTab === 'seo') {
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          {seoAnalysis ? (
+            <SeoReport analysis={seoAnalysis} />
+          ) : (
+            <div className="seo-empty">
+              <i className="fas fa-spinner fa-spin" />
+              <p>Generando analisis SEO...</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    if (activeTab === 'copy') {
+      return (
+        <div className="output-box">
+          <h4>{current.title}</h4>
+          {copyAnalysis ? (
+            <AnalysisReport
+              strengths={copyAnalysis.strengths}
+              weaknesses={copyAnalysis.weaknesses}
+              recommendations={copyAnalysis.recommendations}
+              emptyMsg="Completa la descripcion para obtener un analisis de copywriting."
+            />
+          ) : (
+            <div className="seo-empty">
+              <i className="fas fa-spinner fa-spin" />
+              <p>Generando analisis de copywriting...</p>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const isAnalysisTab = activeTab === 'seo' || activeTab === 'copy';
 
   return (
     <div className="step-panel active">
@@ -132,18 +192,8 @@ export function ResultPanel({ output, seoAnalysis, onEdit, onCopy, onExportJSON 
       </div>
 
       <div className="output-panel active">
-        {activeTab === 'seo' ? (
-          <div className="output-box">
-            <h4>{current.title}</h4>
-            {seoAnalysis ? (
-              <SeoReport analysis={seoAnalysis} />
-            ) : (
-              <div className="seo-empty">
-                <i className="fas fa-spinner fa-spin" />
-                <p>Generando analisis SEO...</p>
-              </div>
-            )}
-          </div>
+        {isAnalysisTab ? (
+          renderAnalysisTab()
         ) : (
           <div className="output-box">
             <h4>{current.title}</h4>
