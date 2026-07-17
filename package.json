@@ -1,0 +1,8 @@
+{
+  "name": "optimlia",
+  "version": "1.0.0",
+  "description": "Optimizador de Publicaciones MercadoLibre",
+  "scripts": {
+    "dev": "npx serve . -l 3000 -s"
+  }
+}
